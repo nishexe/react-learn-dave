@@ -1,23 +1,63 @@
 import { useState } from "react";
+import { FaTrashAlt } from "react-icons/fa";
 const Content = () => {
-  const [name, setName] = useState("Manish");
-  const [count, setCount] = useState(0);
-  const handleNameChange = () => {
-    const names = ["Manish", "Arpit", "Sid"];
-    const randomIdx = Math.floor(Math.random() * 3);
-    setName(names[randomIdx]);
+  const [items, setItems] = useState([
+    {
+      id: 1,
+      checked: false,
+      item: "One half pund bag of Coco",
+    },
+    {
+      id: 2,
+      checked: false,
+      item: "Item 2",
+    },
+    {
+      id: 3,
+      checked: false,
+      item: "Item 3",
+    },
+  ]);
+
+  const handleCheck = (id) => {
+    const listItems = items.map((item) =>
+      item.id === id ? { ...item, checked: !item.checked } : item
+    );
+    setItems(listItems);
+    localStorage.setItem("shoppinglist", JSON.stringify(listItems));
   };
-  const increaseCount = () => {
-    setCount(count + 1);
-    console.log(count);
+
+  const handleDelete = (id) => {
+    const listItems = items.filter((item) => item.id !== id);
+    setItems(listItems);
+    localStorage.setItem("shoppinglist", JSON.stringify(listItems));
   };
+
   return (
     <main>
-      <p>HELLO {name}!</p>
-      <button onClick={handleNameChange}>CHANGE NAME</button>
-      <br></br>
-      <br></br>
-      <button onClick={increaseCount}>{count}</button>
+      {items.length ? (
+        <ul>
+          {items.map((item) => (
+            <li className="item" key={item.id}>
+              <input
+                type="checkbox"
+                onChange={() => handleCheck(item.id)}
+                checked={item.checked}
+              />
+              <label
+                style={item.checked ? { textDecoration: "line-through" } : null}
+              >
+                {item.item}
+              </label>
+              <button onClick={() => handleDelete(item.id)}>
+                <FaTrashAlt></FaTrashAlt>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>NO ITEMS IN THE LIST</p>
+      )}
     </main>
   );
 };
