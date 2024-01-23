@@ -37,3 +37,12 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+button:hover {
+  border-radius: 8px;
+  border: 1px solid white;
+}
+button:active {
+  border-radius: 8px;
+  border: 1px solid red;
+}
