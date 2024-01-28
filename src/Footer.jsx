@@ -1,5 +1,4 @@
 const Footer = ({ length, isLoading }) => {
-  const today = new Date();
   return (
     <footer>
       {isLoading ? (
