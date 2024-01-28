@@ -6,12 +6,29 @@ import SearchItem from "./SearchItem";
 import "./App.css";
 import { useState, useEffect } from "react";
 function App() {
-  const [items, setItems] = useState(
-    JSON.parse(localStorage.getItem("shoppinglist")) || []
-  );
+  const API_URL = "http://localhost:3500/items";
+  const [fetchError, setFetchError] = useState(null);
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    localStorage.setItem("shoppinglist", JSON.stringify(items));
-  }, [items]);
+    const fetchItems = async () => {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw Error("Did not reciveve the data!");
+        const listItems = await response.json();
+        setItems(listItems);
+        setFetchError(null);
+      } catch (err) {
+        setFetchError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    setTimeout(() => {
+      (async () => await fetchItems())();
+    }, 2000);
+  }, []);
+
   const [newItem, setNewItem] = useState("");
 
   const [search, setSearch] = useState("");
@@ -50,14 +67,23 @@ function App() {
         handleSubmit={handleSubmit}
         setNewItem={setNewItem}
       />
-      <Content
-        items={items.filter((item) =>
-          item.item.toLowerCase().includes(search.toLowerCase())
+      <main>
+        {fetchError ? (
+          <p style={{ color: "red" }}>Did not recive the data!</p>
+        ) : (
+          <>
+            <Content
+              items={items.filter((item) =>
+                item.item.toLowerCase().includes(search.toLowerCase())
+              )}
+              handleCheck={handleCheck}
+              handleDelete={handleDelete}
+              isLoading={isLoading}
+            />
+          </>
         )}
-        handleCheck={handleCheck}
-        handleDelete={handleDelete}
-      />
-      <Footer length={items.length} />
+      </main>
+      <Footer length={items.length} isLoading={isLoading} />
     </>
   );
 }
